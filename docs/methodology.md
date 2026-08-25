@@ -38,7 +38,7 @@ u\frac{\partial v}{\partial x} + v\frac{\partial v}{\partial y}
 = 0
 $$
 
-The system is parameterized by the Reynolds number, $\mathrm{Re}$.
+The system is parameterized by the Reynolds number, $\mathrm{Re}$..
 
 ## 2. Boundary Conditions
 The boundary conditions enforce no-slip walls on the left, right, and bottom, and a driven lid on the top. 
