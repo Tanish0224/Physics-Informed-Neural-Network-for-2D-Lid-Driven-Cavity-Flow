@@ -31,37 +31,48 @@ This guarantees that $u(0,1) = 0$ and $u(1,1) = 0$, while the peak velocity at $
 *   Right wall ($x=1$): $u = 0$, $v = 0$
 
 ## 3. Network Architecture
-A Multi-Layer Perceptron (MLP) acts as the function approximator for the solution $[u, v, p]$. The architecture is motivated by findings that deep PINNs can suffer from gradient pathologies, and utilizing mixed activation functions can help spectral bias and gradient flow.
-*   **Input Layer:** 2 neurons for $(x, y)$.
-*   **Hidden Layer 0:** 64 neurons with **Sine** activation ($\sin(x)$).
-*   **Hidden Layers 1 to 8:** 64 neurons with **Hyperbolic Tangent** activation ($\tanh(x)$).
-*   **Output Layer:** 3 neurons for raw unbounded predictions $[u_{\text{raw}}, v_{\text{raw}}, p_{\text{raw}}]$.
-*   **Initialization:** Xavier Normal initialization.
+
+A Multi-Layer Perceptron (MLP) acts as the function approximator for the solution $[u, v, p]$. The architecture is motivated by findings that deep PINNs can suffer from gradient pathologies, and utilizing mixed activation functions can help address spectral bias and improve gradient flow.
+
+* **Input Layer:** 2 neurons for $(x, y)$.
+* **Hidden Layer 0:** 64 neurons with **Sine** activation ($\sin(x)$).
+* **Hidden Layers 1 to 8:** 64 neurons with **Hyperbolic Tangent** activation ($\tanh(x)$).
+* **Output Layer:** 3 neurons for raw predictions $[u_{\text{raw}}, v_{\text{raw}}, p_{\text{raw}}]$.
+* **Initialization:** Xavier Normal initialization.
 
 ## 4. Output Transformation (Exact Boundary Enforcement)
-Instead of adding boundary condition violations to the loss function (soft constraint), we construct a trial function that inherently satisfies the boundary conditions (hard constraint) via an output transformation (Lagaris et al. 1998).
+
+Instead of adding boundary condition violations to the loss function as soft constraints, a trial function is constructed that inherently satisfies the boundary conditions through an output transformation based on the hard-constraint approach of Lagaris et al. (1998).
 
 First, define a distance function $B(x,y)$ that is zero on all boundaries:
-$$ B(x,y) = x(1-x)y(1-y) $$
+
+$$B(x,y) = x(1-x)y(1-y)$$
 
 The final physical predictions $[u, v, p]$ are constructed as follows:
-$$ u(x,y) = B(x,y) \cdot u_{\text{raw}} + y^4 \cdot u_{\text{lid}}(x) $$
-$$ v(x,y) = B(x,y) \cdot v_{\text{raw}} $$
 
-The term $y^4 \cdot u_{\text{lid}}(x)$ satisfies the top lid condition when $y=1$ and decays to $0$ as $y \rightarrow 0$. Because $B(x,y)$ is zero everywhere on the boundary, $u$ and $v$ perfectly satisfy the problem constraints irrespective of the network's raw output.
+$$u(x,y) = B(x,y) \cdot u_{\text{raw}}(x,y) + y^4 \cdot u_{\text{lid}}(x)$$
+
+$$v(x,y) = B(x,y) \cdot v_{\text{raw}}(x,y)$$
+
+The term $y^4 \cdot u_{\text{lid}}(x)$ satisfies the top-lid condition when $y=1$ and decays to $0$ as $y \rightarrow 0$. Because $B(x,y)$ is zero everywhere on the boundary, $u$ and $v$ satisfy the prescribed velocity boundary conditions irrespective of the network's raw output.
 
 ## 5. Pressure Gauge
-In incompressible flow without pressure boundaries, pressure is unique only up to an additive constant. A soft gauge constraint like $p(0,0)=0$ is often added to the loss function. Here, we enforce it structurally by evaluating the raw pressure at the origin and subtracting it from the whole field:
-$$ p(x,y) = p_{\text{raw}}(x,y) - p_{\text{raw}}(0,0) $$
+
+In incompressible flow without pressure boundary conditions, pressure is unique only up to an additive constant. A soft gauge constraint such as $p(0,0)=0$ is often added to the loss function. Here, the gauge is enforced structurally by evaluating the raw pressure at the origin and subtracting it from the predicted field:
+
+$$p(x,y) = p_{\text{raw}}(x,y) - p_{\text{raw}}(0,0)$$
 
 ## 6. Automatic Differentiation and PDE Residuals
-The partial derivatives required for the Navier-Stokes residuals are computed exactly using PyTorch's Automatic Differentiation engine (`torch.autograd.grad`). 
-Computing the Laplacian involves computing the gradient of the gradient, requiring the computational graph of the first derivative to be retained (`create_graph=True`).
+
+The partial derivatives required for the Navier-Stokes residuals are computed using PyTorch's automatic differentiation engine (`torch.autograd.grad`). Computing the Laplacian requires differentiating the first derivatives, so the computational graph of the first derivative is retained using `create_graph=True`.
 
 ## 7. Loss Function
-The total loss is purely the Mean Squared Error (MSE) of the PDE residuals evaluated at a set of collocation points $(x_i, y_i)$.
-$$ \mathcal{L} = \frac{1}{N} \sum_{i=1}^N \left( R_{\text{cont}}^2 + R_{\text{mom}, u}^2 + R_{\text{mom}, v}^2 \right) $$
-where $N = 16,384$ interior points are distributed using a Chebyshev-Gauss-Lobatto (CGL) grid, which clusters points near the boundaries to better capture the boundary layer gradients.
+
+The total loss is the Mean Squared Error (MSE) of the PDE residuals evaluated at a set of collocation points $(x_i, y_i)$:
+
+$$\mathcal{L} = \frac{1}{N}\sum_{i=1}^{N}\left(R_{\text{cont}}^2 + R_{\text{mom},u}^2 + R_{\text{mom},v}^2\right)$$
+
+where $N=16{,}384$ interior points are distributed using a Chebyshev-Gauss-Lobatto (CGL) grid, which clusters points near the boundaries to better capture boundary-layer gradients.
 
 ## 8. Curriculum Training
 Directly training at $\text{Re} = 1000$ often leads the optimizer into poor local minima (e.g., trivial Stokes flow solutions). A curriculum strategy is used, sequentially increasing the Reynolds number: $\text{Re} \in \{100, 400, 700, 1000\}$.
