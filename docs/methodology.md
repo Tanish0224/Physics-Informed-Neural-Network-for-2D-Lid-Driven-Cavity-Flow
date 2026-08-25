@@ -35,7 +35,7 @@ This guarantees that $u(0,1) = 0$ and $u(1,1) = 0$, while the peak velocity at $
 A Multi-Layer Perceptron (MLP) acts as the function approximator for the solution $[u, v, p]$. The architecture is motivated by findings that deep PINNs can suffer from gradient pathologies, and utilizing mixed activation functions can help address spectral bias and improve gradient flow.
 
 * **Input Layer:** 2 neurons for $(x, y)$.
-* **Hidden Layer 0:** 64 neurons with **Sine** activation ($\sin(x)$).
+* **Hidden Layer 0:** 64 neurons with **Sine** activation ($\operatorname{sin}(x)$).
 * **Hidden Layers 1 to 8:** 64 neurons with **Hyperbolic Tangent** activation ($\tanh(x)$).
 * **Output Layer:** 3 neurons for raw predictions $[u_{\text{raw}}, v_{\text{raw}}, p_{\text{raw}}]$.
 * **Initialization:** Xavier Normal initialization.
