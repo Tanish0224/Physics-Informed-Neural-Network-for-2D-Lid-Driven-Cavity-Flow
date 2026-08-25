@@ -3,14 +3,42 @@
 This document details the mathematical formulation and numerical methods used in the implementation of the PINN for the regularized lid-driven cavity problem.
 
 ## 1. Governing Equations
+
 The problem solves the steady, incompressible 2D Navier-Stokes equations in non-dimensional form on the unit square domain $\Omega = [0,1] \times [0,1]$.
 
-*   **Continuity Equation:**
-    $$ \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} = 0 $$
-*   **x-Momentum Equation:**
-    $$ u\frac{\partial u}{\partial x} + v\frac{\partial u}{\partial y} + \frac{\partial p}{\partial x} - \frac{1}{\text{Re}}\left(\frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}\right) = 0 $$
-*   **y-Momentum Equation:**
-    $$ u\frac{\partial v}{\partial x} + v\frac{\partial v}{\partial y} + \frac{\partial p}{\partial y} - \frac{1}{\text{Re}}\left(\frac{\partial^2 v}{\partial x^2} + \frac{\partial^2 v}{\partial y^2}\right) = 0 $$
+* **Continuity Equation:**
+
+$$
+\frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} = 0
+$$
+
+* **x-Momentum Equation:**
+
+$$
+u\frac{\partial u}{\partial x}
++ v\frac{\partial u}{\partial y}
++ \frac{\partial p}{\partial x}
+- \frac{1}{\text{Re}}
+\left(
+\frac{\partial^2 u}{\partial x^2}
++ \frac{\partial^2 u}{\partial y^2}
+\right)
+= 0
+$$
+
+* **y-Momentum Equation:**
+
+$$
+u\frac{\partial v}{\partial x}
++ v\frac{\partial v}{\partial y}
++ \frac{\partial p}{\partial y}
+- \frac{1}{\text{Re}}
+\left(
+\frac{\partial^2 v}{\partial x^2}
++ \frac{\partial^2 v}{\partial y^2}
+\right)
+= 0
+$$
 
 The system is parameterized by the Reynolds number, $\text{Re}$.
 
