@@ -6,39 +6,16 @@ This document details the mathematical formulation and numerical methods used in
 
 The problem solves the steady, incompressible 2D Navier-Stokes equations in non-dimensional form on the unit square domain $\Omega = [0,1] \times [0,1]$.
 
-### Continuity Equation
+**Continuity Equation:**\
+$$\frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} = 0$$
 
-$$
-\frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} = 0
-$$
+**x-Momentum Equation:**\
+$$u\frac{\partial u}{\partial x} + v\frac{\partial u}{\partial y} + \frac{\partial p}{\partial x} - \frac{1}{\mathrm{Re}}\left(\frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}\right) = 0$$
 
-### x-Momentum Equation
+**y-Momentum Equation:**\
+$$u\frac{\partial v}{\partial x} + v\frac{\partial v}{\partial y} + \frac{\partial p}{\partial y} - \frac{1}{\mathrm{Re}}\left(\frac{\partial^2 v}{\partial x^2} + \frac{\partial^2 v}{\partial y^2}\right) = 0$$
 
-$$
-u\frac{\partial u}{\partial x} + v\frac{\partial u}{\partial y}
-+ \frac{\partial p}{\partial x}
-- \frac{1}{\mathrm{Re}}
-\left(
-\frac{\partial^2 u}{\partial x^2}
-+ \frac{\partial^2 u}{\partial y^2}
-\right)
-= 0
-$$
-
-### y-Momentum Equation
-
-$$
-u\frac{\partial v}{\partial x} + v\frac{\partial v}{\partial y}
-+ \frac{\partial p}{\partial y}
-- \frac{1}{\mathrm{Re}}
-\left(
-\frac{\partial^2 v}{\partial x^2}
-+ \frac{\partial^2 v}{\partial y^2}
-\right)
-= 0
-$$
-
-The system is parameterized by the Reynolds number, $\mathrm{Re}$..
+The system is parameterized by the Reynolds number, $\mathrm{Re}$.
 
 ## 2. Boundary Conditions
 The boundary conditions enforce no-slip walls on the left, right, and bottom, and a driven lid on the top. 
